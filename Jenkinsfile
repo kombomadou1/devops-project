@@ -12,7 +12,6 @@ pipeline {
 
     stages {
         stage('Checkout') {
-        	agent controller
             steps {
                 checkout scm
             }
@@ -62,12 +61,12 @@ pipeline {
         }
 
         stage('Deploy') {
-            container("kubectl"){
-                steps {
-                    withKubeConfig([credentialsId: 'k3s-kubeconfig']) {
+            steps {
+                container("kubectl"){
+                    withKubeConfig([credentialsId: 'k3s-credentials']) {
                         sh """
                             kubectl apply -f k8s/app/back-asso-deploy.yaml
-                            kubectl apply -f k8s/app/back-asso-deploy.yaml
+                            kubectl apply -f k8s/app/back-asso-service.yaml
                             kubectl rollout status deployment/back-ges-asso
                         """
                     }
