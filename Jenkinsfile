@@ -51,6 +51,9 @@ pipeline {
             steps {
                 container('kaniko') {
                     sh """
+                        ls -la /kaniko/.docker
+                        cat /kaniko/.docker/config.json
+
                         /kaniko/executor \\
                           --context=\${WORKSPACE}/app/backend \\
                           --dockerfile=\${WORKSPACE}/app/backend/Dockerfile \\
