@@ -42,7 +42,7 @@ export class UsersUpdate implements OnInit {
     this.editForm = this.fb.group({
       lastname: ['', Validators.required],
       firstname: ['', Validators.required],
-      age: ['', Validators.required, Validators.min(1)],
+      age: ['', [Validators.required, Validators.min(1)]],
 
       password: [{ value: '', disabled: true }],
 

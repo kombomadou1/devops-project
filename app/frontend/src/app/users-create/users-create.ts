@@ -38,7 +38,7 @@ export class UsersCreate {
     this.userForm = this.fb.group({
       lastname: ['', Validators.required],
       firstname: ['', Validators.required],
-      age: ['', Validators.required, Validators.min(1)],
+      age: ['', [Validators.required, Validators.min(1)]],
       password: ['', Validators.required],
     });
   }
