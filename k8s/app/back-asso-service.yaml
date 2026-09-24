@@ -2,9 +2,9 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app: back-asso
+    app: back-ges-asso
     project: devops
-  name: back-asso-service
+  name: back-ges-asso-service
 spec:
   ports:
   - port: 3000
@@ -12,6 +12,6 @@ spec:
     targetPort: 3000
     nodePort: 30000
   selector:
-    app: back-asso
+    app: back-ges-asso
     project: devops
   type: NodePort

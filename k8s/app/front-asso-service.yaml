@@ -2,9 +2,9 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app: front-asso-service
+    app: front-ges-asso-service
     project: devops
-  name: front-asso
+  name: front-ges-asso
 spec:
   ports:
   - port: 80
@@ -12,7 +12,7 @@ spec:
     targetPort: 80
     nodePort: 30200
   selector:
-    app: front-asso
+    app: front-ges-asso
     project: devops
   type: NodePort
 status:

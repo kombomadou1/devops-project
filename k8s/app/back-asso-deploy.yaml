@@ -2,23 +2,23 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: back-asso
-  name: back-asso
+    app: back-ges-asso
+  name: back-ges-asso
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: back-asso
+      app: back-ges-asso
       project: devops
   strategy: {}
   template:
     metadata:
       labels:
-        app: back-asso
+        app: back-ges-asso
         project: devops
     spec:
       containers:
       - image: kombomadou/back-ges-asso:prod
-        name: back-ges-asso-m89xq
+        name: back-ges-asso
         ports:
           - containerPort: 3000

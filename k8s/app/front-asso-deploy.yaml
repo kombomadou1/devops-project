@@ -2,23 +2,23 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: front-asso
-  name: front-asso
+    app: front-ges-asso
+  name: front-ges-asso
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: front-asso
+      app: front-ges-asso
       project: devops
   template:
     metadata:
       labels:
-        app: front-asso
+        app: front-ges-asso
         project: devops
     spec:
       containers:
       - image: kombomadou/front-ges-asso:prod
-        name: front-ges-asso-mqsvz
+        name: front-ges-asso
         ports:
           - containerPort: 80
         env:

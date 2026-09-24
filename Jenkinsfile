@@ -66,8 +66,8 @@ pipeline {
                 steps {
                     withKubeConfig([credentialsId: 'k3s-kubeconfig']) {
                         sh """
-                            kubectl apply -f k8s/back-ges-asso-deploy.yaml
-                            kubectl apply -f k8s/back-ges-asso-service.yaml
+                            kubectl apply -f k8s/app/back-asso-deploy.yaml
+                            kubectl apply -f k8s/app/back-asso-deploy.yaml
                             kubectl rollout status deployment/back-ges-asso
                         """
                     }
