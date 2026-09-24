@@ -1,0 +1,54 @@
+Vagrant.configure("2") do |config|
+  config.vm.box = "debian/bookworm64"
+
+  config.vm.define "k3s-master" do |master|
+    master.vm.hostname = "k3s-master"
+
+    # NAT par défaut : accès Internet
+    # Host-Only : accès direct entre Windows et les VMs
+    master.vm.network "private_network", ip: "192.168.56.10"
+
+    master.vm.provider "virtualbox" do |vb|
+      vb.name = "devops-k3s-master"
+      vb.memory = 4096 #3072
+      vb.cpus = 5
+    end
+
+    master.vm.network "forwarded_port", guest: 22, host: 2222
+    master.vm.network "forwarded_port", guest: 6443, host: 6443
+  end
+
+  config.vm.define "k3s-worker" do |worker|
+    worker.vm.hostname = "k3s-worker"
+
+    # NAT par défaut : accès Internet
+    # Host-Only : accès direct entre Windows et les VMs
+    worker.vm.network "private_network", ip: "192.168.56.11"
+
+    worker.vm.provider "virtualbox" do |vb|
+      vb.name = "devops-k3s-worker"
+      vb.memory = 2048
+      vb.cpus = 2
+    end
+
+    worker.vm.network "forwarded_port", guest: 22, host: 2223
+  end
+
+  #SWAP DE 2GO
+  config.vm.provision "shell", inline: <<-SHELL
+    if ! command -v swapon >/dev/null 2>&1; then
+      apt-get update
+      apt-get install -y util-linux
+    fi
+
+    if [ ! -f /swapfile ]; then
+      dd if=/dev/zero of=/swapfile bs=1M count=2048
+      chmod 600 /swapfile
+      mkswap /swapfile
+      swapon /swapfile
+      echo "/swapfile none swap sw 0 0" >> /etc/fstab
+    elif ! swapon --show | grep -q "/swapfile"; then
+      swapon /swapfile
+    fi
+  SHELL
+end

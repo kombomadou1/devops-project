@@ -1,0 +1,67 @@
+<div class="layout">
+
+  <!-- Navbar -->
+  <header class="navbar">
+    <app-nav></app-nav>
+  </header>
+
+  <div class="main">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <app-sidenav></app-sidenav>
+    </aside>
+
+    <!-- Contenu -->
+    <main class="content">
+
+      <mat-card class="example-card" >
+        <mat-card-header >
+          <div mat-card-avatar class="example-header-image"></div>
+          <mat-card-title>Ajouter un utilisateur à <strong>{{this.associationData?.name}}</strong></mat-card-title>
+        </mat-card-header>
+      </mat-card>
+
+      <!-- DEBUT -->
+            <form (ngSubmit)="addUserToAssociation(addForm)" #addForm="ngForm">
+                <mat-form-field>
+                    <mat-label>Selectionnez un utilsateur</mat-label>
+                    <mat-select [(value)]="userSelected" name="user">
+                        <mat-option>None</mat-option>
+                        @for (user of userData; track $index) {
+                            <mat-option [value]="user.id">{{user.lastname}} {{user.firstname}}</mat-option>
+                        }
+                    </mat-select>
+                    </mat-form-field>
+                    
+                <mat-form-field appearance="outline" class="block_input">
+                    <mat-label>Rôle</mat-label>
+                    <input matInput required="" name="rolename" [(ngModel)]="roleName" >
+                </mat-form-field>
+                
+                <button class="submit_button" type="submit" matButton="filled" [disabled]="addForm.invalid">
+                    Ajouter
+                </button>
+            </form>
+      
+
+    <!-- FIN -->
+
+    </main>
+
+  </div>
+</div>
+
+<style>
+  .main {
+    display: flex;
+  }
+
+  .content {
+    flex: 1 1 auto;      
+    min-width: 0;        
+    overflow: auto;
+    padding: 16px;
+  }
+</style>
+

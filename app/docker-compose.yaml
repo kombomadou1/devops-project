@@ -1,0 +1,19 @@
+services:
+  front-ges-asso:
+    image: front-ges-asso:prod
+    ports:
+      - "4200:80"
+    environment:
+      API_URL: "http://back-ges-asso:3000"
+    depends_on:
+      - back-ges-asso
+    networks:
+      - devops_net
+  back-ges-asso:
+    image: back-ges-asso:prod
+    ports:
+     - "3000:3000"
+    networks:
+     - devops_net
+networks:
+  devops_net:

@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: front-asso-service
+    project: devops
+  name: front-asso
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 80
+    nodePort: 30200
+  selector:
+    app: front-asso
+    project: devops
+  type: NodePort
+status:
+  loadBalancer: {}

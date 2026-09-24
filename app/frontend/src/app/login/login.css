@@ -1,0 +1,16 @@
+.error{
+    color: red;
+}
+
+.block_login {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  gap: 16px;
+}
+
+.block_input {
+  width: 300px;
+}

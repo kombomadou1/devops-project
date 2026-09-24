@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: front-asso
+  name: front-asso
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: front-asso
+      project: devops
+  template:
+    metadata:
+      labels:
+        app: front-asso
+        project: devops
+    spec:
+      containers:
+      - image: kombomadou/front-ges-asso:prod
+        name: front-ges-asso-mqsvz
+        ports:
+          - containerPort: 80
+        env:
+          - name: API_URL
+            value: "http://back-asso-service:3000"

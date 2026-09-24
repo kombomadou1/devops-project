@@ -1,0 +1,76 @@
+<div class="layout">
+  <!-- Navbar -->
+  <header class="navbar">
+    <app-nav></app-nav>
+  </header>
+
+  <div class="main">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <app-sidenav></app-sidenav>
+    </aside>
+
+    <!-- Contenu -->
+    <main class="content">
+      <mat-card>
+        <mat-card-header>
+          <mat-card-title>Modification d'utilisateur</mat-card-title>
+        </mat-card-header>
+
+        <mat-card-content>
+          <form [formGroup]="editForm" (ngSubmit)="onSubmit()" class="example-form">
+            <mat-form-field class="example-full-width" appearance="outline">
+              <mat-label>Prenom</mat-label>
+              <input matInput formControlName="firstname" />
+            </mat-form-field>
+
+            <mat-form-field class="example-full-width" appearance="outline">
+              <mat-label>Nom</mat-label>
+              <input matInput formControlName="lastname" />
+            </mat-form-field>
+
+            <mat-form-field class="example-full-width" appearance="outline">
+              <mat-label>Age</mat-label>
+              <input matInput type="number" formControlName="age" />
+            </mat-form-field>
+
+            <button mat-raised-button type="submit" [disabled]="editForm.invalid || loading">
+              Modifier
+            </button>
+            @if (error) {
+            <div class="error">{{ error }}</div>
+            }
+          </form>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- DEBUT -->
+
+      <!-- FIN -->
+    </main>
+  </div>
+</div>
+
+<style>
+  .main {
+    display: flex;
+  }
+
+  .content {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: auto;
+    padding: 16px;
+  }
+  .example-form {
+    display: flex;
+    flex-direction: column;
+    /* gap: 20px; */
+    /* padding: 20px; */
+  }
+  input {
+    height: 30px;
+    width: 100%;
+  }
+ 
+</style>

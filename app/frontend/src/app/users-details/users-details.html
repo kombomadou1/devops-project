@@ -1,0 +1,78 @@
+<div class="layout">
+  <!-- Navbar -->
+  <header class="navbar">
+    <app-nav></app-nav>
+  </header>
+
+  <div class="main">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <app-sidenav></app-sidenav>
+    </aside>
+
+    <!-- Contenu -->
+    <main class="content">
+      <mat-card class="example-card">
+        <mat-card-header>
+          <div mat-card-avatar class="example-header-image"></div>
+          <mat-card-title>Fiche utilisateur</mat-card-title>
+        </mat-card-header>
+      </mat-card>
+
+      <!-- DEBUT -->
+
+      <!-- Barre de recherche   -->
+      <main class="content">
+        @if (!loading) {
+        <mat-card>
+          <mat-card-header>
+            <mat-card-title> Details de l'utilisateur </mat-card-title>
+          </mat-card-header>
+
+          <mat-card-content>
+            <p><strong>Nom:</strong>{{ user.lastname }}</p>
+            <p><strong>Prenom:</strong>{{ user.firstname }}</p>
+            <p><strong>Age:</strong>{{ user.age }}</p>
+
+            <h3>Associations</h3>
+            @if (user.roles.length>0) {
+            <ul>
+              @for (role of user.roles; track role.idAssociation) {
+              <li>Association #{{ role.associationName }} - {{ role.name }}</li>
+              }
+            </ul>
+            } @else {
+            <p>Aucune association enregistrée.</p>
+            }
+          </mat-card-content>
+
+          <mat-card-actions>
+            <button mat-button color="primary" (click)="backToList()">Retour</button>
+          </mat-card-actions>
+        </mat-card>
+        } @if (error) {
+        <p>{{ error }}</p>
+        }
+      </main>
+
+      <!-- FIN -->
+    </main>
+  </div>
+</div>
+
+<style>
+  .main {
+    display: flex;
+  }
+
+  .content {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: auto;
+    padding: 16px;
+  }
+
+  .search-bar {
+    margin: 16px 0;
+  }
+</style>

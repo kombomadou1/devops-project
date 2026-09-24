@@ -1,0 +1,117 @@
+<div class="layout">
+
+  <!-- Navbar -->
+  <header class="navbar">
+    <app-nav></app-nav>
+  </header>
+
+  <div class="main">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <app-sidenav></app-sidenav>
+    </aside>
+
+    <!-- Contenu -->
+    <main class="content">
+
+      <mat-card class="example-card" >
+        <mat-card-header >
+          <div mat-card-avatar class="example-header-image"></div>
+          <mat-card-title>Liste des membre de <strong>{{dataSource?.name}}</strong></mat-card-title>
+        </mat-card-header>
+      </mat-card>
+
+      <!-- DEBUT -->
+
+      <mat-tab-group>
+        <mat-tab label="Membres"> 
+            <table mat-table [dataSource]="dataSource?.members ?? []" class="mat-elevation-z8">
+
+                <ng-container matColumnDef="id">
+                <th mat-header-cell *matHeaderCellDef> id </th>
+                <td mat-cell *matCellDef="let user"> {{user.id}} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="name">
+                <th mat-header-cell *matHeaderCellDef> Nom </th>
+                <td mat-cell *matCellDef="let user"> {{user.name}} </td>
+                </ng-container>
+                <ng-container matColumnDef="firstname">
+                <th mat-header-cell *matHeaderCellDef> Prénom </th>
+                <td mat-cell *matCellDef="let user"> {{user.firstname}} </td>
+                </ng-container>
+                <ng-container matColumnDef="age">
+                <th mat-header-cell *matHeaderCellDef> Age </th>
+                <td mat-cell *matCellDef="let user"> {{user.age}} </td>
+                </ng-container>
+                <ng-container matColumnDef="role">
+                <th mat-header-cell *matHeaderCellDef> Rôle </th>
+                <td mat-cell *matCellDef="let user"> {{user.role}} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="actions">
+                <th mat-header-cell *matHeaderCellDef> Actions </th>
+                <td mat-cell *matCellDef="let user"> 
+                    <section>
+                        <div class="example-button-row" style="margin: 5px;">
+                            <button matFab (click)="goToUser(user.id)" aria-label="Example icon button with a delete icon" >
+                                <mat-icon>delete</mat-icon>
+                            </button>
+                        </div>
+                            
+                    </section>  
+                </td>
+                </ng-container>
+            
+            
+                <tr mat-header-row *matHeaderRowDef="displayedMembersColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedMembersColumns;"></tr>
+            </table>
+        </mat-tab>
+        <mat-tab label="Minutes">
+              <table mat-table [dataSource]="minutes" class="mat-elevation-z8">
+
+                <ng-container matColumnDef="idMinute">
+                <th mat-header-cell *matHeaderCellDef> id </th>
+                <td mat-cell *matCellDef="let minute"> {{minute.id}} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="date">
+                <th mat-header-cell *matHeaderCellDef> Nom </th>
+                <td mat-cell *matCellDef="let minute"> {{minute.date}} </td>
+                </ng-container>
+                <ng-container matColumnDef="content">
+                <th mat-header-cell *matHeaderCellDef> Prénom </th>
+                <td mat-cell *matCellDef="let minute"> {{minute.content}} </td>
+                </ng-container>
+            
+                <tr mat-header-row *matHeaderRowDef="displayedMinutesColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedMinutesColumns;"></tr>
+            </table>
+        </mat-tab>
+    </mat-tab-group>
+
+       
+      
+
+    <!-- FIN -->
+
+    </main>
+
+  </div>
+</div>
+
+<style>
+  .main {
+    display: flex;
+  }
+
+  .content {
+    flex: 1 1 auto;      
+    min-width: 0;        
+    overflow: auto;
+    padding: 16px;
+  }
+</style>
+

@@ -1,0 +1,10 @@
+.example-container{
+    height: 100vh;
+    
+}
+
+.example-sidenav {
+    width: 240px;
+    /* background-color: blue; */
+    padding-left:25px;
+}

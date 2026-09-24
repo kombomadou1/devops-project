@@ -1,0 +1,95 @@
+<div class="layout">
+
+  <!-- Navbar -->
+  <header class="navbar">
+    <app-nav></app-nav>
+  </header>
+
+  <div class="main">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <app-sidenav></app-sidenav>
+    </aside>
+
+    <!-- Contenu -->
+    <main class="content">
+
+      <mat-card class="example-card" >
+        <mat-card-header >
+          <div mat-card-avatar class="example-header-image"></div>
+          <mat-card-title>Liste des associations</mat-card-title>
+        </mat-card-header>
+      </mat-card>
+
+      <!-- DEBUT -->
+       <form (ngSubmit)="searchAssociationById()" #searchForm="ngForm">
+            
+            <mat-form-field>
+              <mat-label>
+                Recherche
+              </mat-label>
+              <input matInput required="" name="search" [(ngModel)]="idAssociation" placeholder="Placeholder" type="number">
+            </mat-form-field>
+            
+            <button class="submit_button" type="submit" matButton="filled" [disabled]="searchForm.invalid">
+                Rechercher
+            </button>
+
+           
+        </form>
+       
+      <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
+
+        <ng-container matColumnDef="id">
+          <th mat-header-cell *matHeaderCellDef> id </th>
+          <td mat-cell *matCellDef="let assoc"> {{assoc.id}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="name">
+          <th mat-header-cell *matHeaderCellDef> Nom </th>
+          <td mat-cell *matCellDef="let assoc"> {{assoc.name}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef> Actions </th>
+          <td mat-cell *matCellDef="let assoc"> 
+            <section>
+                <div class="example-button-row" style="margin: 5px;">
+                    <button matButton="filled" (click)="goToAssociation(assoc.id)">Membres</button>
+                    <button matButton="filled" (click)="goToAddRole(assoc.id)">Ajouter rôle</button>
+                    <button matButton="filled" (click)="gotToUpdateForm(assoc.id)">Modifier Nom</button>
+                    <button matFab (click)="confirmDelete(assoc.id)" aria-label="Example icon button with a delete icon">
+                        <mat-icon>delete</mat-icon>
+                    </button>
+                </div>
+                    
+            </section>  
+          </td>
+        </ng-container>
+      
+       
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+
+    <!-- FIN -->
+
+    </main>
+
+  </div>
+</div>
+
+<style>
+  .main {
+    display: flex;
+  }
+
+  .content {
+    flex: 1 1 auto;      
+    min-width: 0;        
+    overflow: auto;
+    padding: 16px;
+  }
+</style>
+

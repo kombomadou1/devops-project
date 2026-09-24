@@ -1,0 +1,108 @@
+# =========================================================
+# Grafana (via le subchart grafana/grafana)
+# =========================================================
+grafana:
+  enabled: true
+
+  # Identifiants admin
+  adminUser: admin
+  adminPassword: admin123
+
+  # Ressources allouées
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+  # Persistance des données Grafana
+  persistence:
+    enabled: true
+    size: 2Gi
+    storageClass: local-path
+
+  # Dashboards Kubernetes préconfigurés
+  defaultDashboardsEnabled: true
+
+  # Sidecar pour charger automatiquement les dashboards
+  sidecar:
+    dashboards:
+      enabled: true
+      searchNamespace: ALL
+
+  # Configuration du service Grafana
+  service:
+    portName: http-web
+    type: NodePort
+    port: 80
+    targetPort: 3000
+    nodePort: 30030
+
+# =========================================================
+# Prometheus
+# =========================================================
+prometheus:
+  enabled: true
+
+  prometheusSpec:
+    retention: 7d
+    replicas: 0
+
+    resources:
+      requests:
+        cpu: 250m
+        memory: 512Mi
+      limits:
+        cpu: "1"
+        memory: 1Gi
+
+# =========================================================
+# Alertmanager (optionnel dans un lab)
+# =========================================================
+alertmanager:
+  enabled: true
+
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 200m
+      memory: 256Mi
+  alertmanagerSpec:
+    replicas: 0
+
+# =========================================================
+# Node Exporter
+# =========================================================
+nodeExporter:
+  enabled: true
+
+# =========================================================
+# Kube State Metrics
+# =========================================================
+kubeStateMetrics:
+  enabled: true
+
+# =========================================================
+# Prometheus Operator
+# =========================================================
+prometheusOperator:
+  enabled: true
+
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 200m
+      memory: 256Mi
+  admissionWebhooks:
+    deployment:
+      replicas: 0
+
+thanosRuler:
+  thanosRulerSpec:
+    replicas: 0

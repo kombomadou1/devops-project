@@ -1,0 +1,57 @@
+<div class="layout">
+
+  <!-- Navbar -->
+  <header class="navbar">
+    <app-nav></app-nav>
+  </header>
+
+  <div class="main">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <app-sidenav></app-sidenav>
+    </aside>
+
+    <!-- Contenu -->
+    <main class="content">
+
+      <mat-card class="example-card" >
+        <mat-card-header >
+          <div mat-card-avatar class="example-header-image"></div>
+          <mat-card-title>Ajouter une association</mat-card-title>
+        </mat-card-header>
+      </mat-card>
+
+      <!-- DEBUT -->
+            <form (ngSubmit)="createAssociation(addForm)" #addForm="ngForm">
+                <mat-form-field appearance="outline" class="block_input">
+                    <mat-label>Ajouter une association</mat-label>
+                    <input matInput required="" name="search" [(ngModel)]="associationName" placeholder="Association" >
+                </mat-form-field>
+                
+                <button class="submit_button" type="submit" matButton="filled" [disabled]="addForm.invalid">
+                    Ajouter
+                </button>
+            </form>
+      
+
+    <!-- FIN -->
+
+    </main>
+
+  </div>
+</div>
+
+<style>
+  .main {
+    display: flex;
+  }
+
+  .content {
+    flex: 1 1 auto;      
+    min-width: 0;        
+    overflow: auto;
+    padding: 16px;
+  }
+</style>
+

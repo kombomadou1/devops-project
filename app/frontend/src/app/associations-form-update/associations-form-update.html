@@ -1,0 +1,57 @@
+<div class="layout">
+
+  <!-- Navbar -->
+  <header class="navbar">
+    <app-nav></app-nav>
+  </header>
+
+  <div class="main">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <app-sidenav></app-sidenav>
+    </aside>
+
+    <!-- Contenu -->
+    <main class="content">
+
+      <mat-card class="example-card" >
+        <mat-card-header >
+          <div mat-card-avatar class="example-header-image"></div>
+          <mat-card-title>Modifiez le nom de l'association <strong>{{this.dataSource?.name}}</strong></mat-card-title>
+        </mat-card-header>
+      </mat-card>
+
+      <!-- DEBUT -->
+            <form (ngSubmit)="updateAssociation(updateForm)" #updateForm="ngForm">
+                <mat-form-field appearance="outline" class="block_input">
+                    <mat-label>Nom</mat-label>
+                    <input matInput required="" name="search" [(ngModel)]="associationName" placeholder="Placeholder" >
+                </mat-form-field>
+                
+                <button class="submit_button" type="submit" matButton="filled" [disabled]="updateForm.invalid">
+                    Modifier
+                </button>
+            </form>
+      
+
+    <!-- FIN -->
+
+    </main>
+
+  </div>
+</div>
+
+<style>
+  .main {
+    display: flex;
+  }
+
+  .content {
+    flex: 1 1 auto;      
+    min-width: 0;        
+    overflow: auto;
+    padding: 16px;
+  }
+</style>
+

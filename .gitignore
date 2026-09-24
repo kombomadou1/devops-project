@@ -1,0 +1,22 @@
+# Vagrant state
+.vagrant/
+
+# Node.js dependencies
+node_modules/
+
+# Build outputs
+dist/
+.angular/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# IDE files
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
