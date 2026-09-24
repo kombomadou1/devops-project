@@ -51,9 +51,6 @@ pipeline {
             steps {
                 container('kaniko') {
                     sh """
-                        ls -la /kaniko/.docker
-                        cat /kaniko/.docker/config.json
-
                         /kaniko/executor \\
                           --context=\${WORKSPACE}/app/backend \\
                           --dockerfile=\${WORKSPACE}/app/backend/Dockerfile \\
@@ -70,6 +67,8 @@ pipeline {
                         sh """
                             kubectl apply -f k8s/app/back-asso-deploy.yaml
                             kubectl apply -f k8s/app/back-asso-service.yaml
+
+                            kubectl set image deployment/back-ges-asso back-ges-asso=${BACKEND_IMAGE}:${IMAGE_TAG}
                             kubectl rollout status deployment/back-ges-asso
                         """
                     }
