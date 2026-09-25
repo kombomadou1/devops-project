@@ -59,7 +59,7 @@ pipeline {
                     steps {
                         container('node') {
                             dir('app/frontend') {
-                                sh 'npm test -- --runInBand'
+                                sh 'npm test'
                             }
                         }
                     }
