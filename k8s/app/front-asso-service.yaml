@@ -5,6 +5,7 @@ metadata:
     app: front-ges-asso-service
     project: devops
   name: front-ges-asso
+  namespace: ges-asso
 spec:
   ports:
   - port: 80

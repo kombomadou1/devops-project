@@ -5,6 +5,7 @@ metadata:
     app: back-ges-asso
     project: devops
   name: back-ges-asso-service
+  namespace: ges-asso
 spec:
   ports:
   - port: 3000
