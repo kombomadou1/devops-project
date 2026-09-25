@@ -99,6 +99,11 @@ pipeline {
                     steps {
                         container('kaniko') {
                             sh """
+                                echo "Workspace: \${WORKSPACE}"
+                                pwd
+                                ls -la \${WORKSPACE}/app/backend
+                                head -n 40 \${WORKSPACE}/app/backend/Dockerfile
+
                                 /kaniko/executor \\
                                   --context=\${WORKSPACE}/app/backend \\
                                   --dockerfile=\${WORKSPACE}/app/backend/Dockerfile \\
@@ -113,6 +118,12 @@ pipeline {
                     steps {
                         container('kaniko') {
                             sh """
+
+                                echo "Workspace: \${WORKSPACE}"
+                                pwd
+                                ls -la \${WORKSPACE}/app/frontend
+                                head -n 40 \${WORKSPACE}/app/frontend/Dockerfile
+                                
                                 /kaniko/executor \\
                                   --context=\${WORKSPACE}/app/frontend \\
                                   --dockerfile=\${WORKSPACE}/app/frontend/Dockerfile \\
