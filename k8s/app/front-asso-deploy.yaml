@@ -24,4 +24,4 @@ spec:
           - containerPort: 80
         env:
           - name: API_URL
-            value: "http://back-asso-service:3000"
+            value: "http://back-ges-asso-service:3000"

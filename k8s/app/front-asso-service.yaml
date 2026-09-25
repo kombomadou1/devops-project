@@ -4,7 +4,7 @@ metadata:
   labels:
     app: front-ges-asso-service
     project: devops
-  name: front-ges-asso
+  name: front-ges-asso-service
   namespace: ges-asso
 spec:
   ports:
