@@ -102,7 +102,8 @@ pipeline {
                                 /kaniko/executor \\
                                   --context=\${WORKSPACE}/app/backend \\
                                   --dockerfile=\${WORKSPACE}/app/backend/Dockerfile \\
-                                  --destination=\${BACKEND_IMAGE}:\${IMAGE_TAG}
+                                  --destination=\${BACKEND_IMAGE}:\${IMAGE_TAG} \\
+                                  --snapshot-mode=redo
                             """
                         }
                     }
@@ -115,7 +116,8 @@ pipeline {
                                 /kaniko/executor \\
                                   --context=\${WORKSPACE}/app/frontend \\
                                   --dockerfile=\${WORKSPACE}/app/frontend/Dockerfile \\
-                                  --destination=\${FRONTEND_IMAGE}:\${IMAGE_TAG}
+                                  --destination=\${FRONTEND_IMAGE}:\${IMAGE_TAG} \\
+                                  --snapshot-mode=redo
                             """
                         }
                     }
