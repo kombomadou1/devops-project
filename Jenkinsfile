@@ -69,7 +69,7 @@ pipeline {
                             kubectl -n ${APP_NAMESPACE} apply -f k8s/app/back-asso-deploy.yaml 
                             kubectl -n ${APP_NAMESPACE} apply -f k8s/app/back-asso-service.yaml 
 
-                            kubectl -n ${APP_NAMESPACE} set image deployment/back-ges-asso back-ges-asso=${BACKEND_IMAGE}:${IMAGE_TAG}
+                            kubectl -n ${APP_NAMESPACE} set image deployment/back-ges-asso back-ges-asso=${DOCKER_IMAGE}:${IMAGE_TAG}
                             kubectl -n ${APP_NAMESPACE} rollout status deployment/back-ges-asso --timeout=180s
                         """
                     }
