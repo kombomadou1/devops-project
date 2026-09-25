@@ -139,7 +139,6 @@ pipeline {
                             kubectl -n ${APP_NAMESPACE} apply -f k8s/app/back-asso-service.yaml 
 
                             kubectl -n ${APP_NAMESPACE} set image deployment/back-ges-asso back-ges-asso=${BACKEND_IMAGE}:${IMAGE_TAG}
-                            kubectl -n ${APP_NAMESPACE} rollout status deployment/back-ges-asso --timeout=180s
                         """
                     }
                 }
@@ -155,7 +154,6 @@ pipeline {
                             kubectl -n ${APP_NAMESPACE} apply -f k8s/app/front-asso-service.yaml 
 
                             kubectl -n ${APP_NAMESPACE} set image deployment/front-ges-asso front-ges-asso=${FRONTEND_IMAGE}:${IMAGE_TAG}
-                            kubectl -n ${APP_NAMESPACE} rollout status deployment/front-ges-asso --timeout=180s
                         """
                     }
                 }
