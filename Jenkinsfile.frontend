@@ -1,0 +1,80 @@
+pipeline {
+    agent {
+        kubernetes {
+           inheritFrom 'devops-template'
+        }
+    }
+
+    environment {
+        DOCKER_IMAGE = 'kombomadou/front-ges-asso'
+        IMAGE_TAG = "build-${BUILD_NUMBER}"
+        APP_NAMESPACE = 'ges-asso'
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Install dependencies') {
+            steps {
+                container('node') {
+                    dir('app/frontend') {
+                        sh 'npm ci'
+                    }
+                }
+            }
+        }
+
+        stage('Tests') {
+            steps {
+                container('node') {
+                    dir('app/frontend') {
+                        sh 'npm test'
+                    }
+                }
+            }
+        }
+
+        stage('Build Angular') {
+            steps {
+                container('node') {
+                    dir('app/frontend') {
+                        sh 'npm run build'
+                    }
+                }
+            }
+        }
+
+        stage('Build and push image') {
+            steps {
+                container('kaniko') {
+                    sh """
+                        /kaniko/executor \\
+                          --context=\${WORKSPACE}/app/frontend \\
+                          --dockerfile=\${WORKSPACE}/app/frontend/Dockerfile \\
+                          --destination=\${DOCKER_IMAGE}:\${IMAGE_TAG}
+                    """
+                }
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                container("kubectl"){
+                    withKubeConfig([credentialsId: 'k3s-credentials']) {
+                        sh """
+                            kubectl -n ${APP_NAMESPACE} apply -f k8s/app/front-asso-deploy.yaml 
+                            kubectl -n ${APP_NAMESPACE} apply -f k8s/app/front-asso-service.yaml 
+
+                            kubectl -n ${APP_NAMESPACE} set image deployment/front-ges-asso front-ges-asso=${DOCKER_IMAGE}:${IMAGE_TAG}
+                            kubectl -n ${APP_NAMESPACE} rollout status deployment/front-ges-asso --timeout=180s
+                        """
+                    }
+                }
+            }
+        }
+    }
+}

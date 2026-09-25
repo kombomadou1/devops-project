@@ -6,7 +6,8 @@ pipeline {
     }
 
     environment {
-        DOCKER_IMAGE = 'kombomadou/front-ges-asso'
+        BACKEND_IMAGE = 'kombomadou/back-ges-asso'
+        FRONTEND_IMAGE = 'kombomadou/front-ges-asso'
         IMAGE_TAG = "build-${BUILD_NUMBER}"
         APP_NAMESPACE = 'ges-asso'
     }
@@ -19,49 +20,133 @@ pipeline {
         }
 
         stage('Install dependencies') {
-            steps {
-                container('node') {
-                    dir('app/frontend') {
-                        sh 'npm ci'
+            parallel{
+                stage("Backend"){
+                    steps {
+                        container('node') {
+                            dir('app/backend') {
+                                sh 'npm ci'
+                            }
+                        }
+                    }
+                }
+
+                stage("Frontend"){
+                    steps {
+                        container('node') {
+                            dir('app/frontend') {
+                                sh 'npm ci'
+                            }
+                        }
                     }
                 }
             }
         }
 
-        stage('Tests') {
-            steps {
-                container('node') {
-                    dir('app/frontend') {
-                        sh 'npm test'
+        stage("Tests"){
+            parallel{
+                stage('Backend') {
+                    steps {
+                        container('node') {
+                            dir('app/backend') {
+                                sh 'npm test -- --runInBand'
+                            }
+                        }
+                    }
+                }
+
+                stage('Frontend') {
+                    steps {
+                        container('node') {
+                            dir('app/frontend') {
+                                sh 'npm test'
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+
+        stage("Build"){
+            parallel{
+                stage('Backend') {
+                    steps {
+                        container('node') {
+                            dir('app/backend') {
+                                sh 'npm run build'
+                            }
+                        }
+                    }
+                }
+
+                stage('Frontend') {
+                    steps {
+                        container('node') {
+                            dir('app/frontend') {
+                                sh 'npm run build'
+                            }
+                        }
                     }
                 }
             }
         }
 
-        stage('Build Angular') {
-            steps {
-                container('node') {
-                    dir('app/frontend') {
-                        sh 'npm run build'
-                    }
-                }
-            }
-        }
 
-        stage('Build and push image') {
+        stage('Build and push Backend image') {
             steps {
                 container('kaniko') {
                     sh """
+                        echo "Workspace: \${WORKSPACE}"
+                        pwd
+                        ls -la \${WORKSPACE}/app/backend
+                        head -n 40 \${WORKSPACE}/app/backend/Dockerfile
+
                         /kaniko/executor \\
-                          --context=\${WORKSPACE}/app/frontend \\
-                          --dockerfile=\${WORKSPACE}/app/frontend/Dockerfile \\
-                          --destination=\${DOCKER_IMAGE}:\${IMAGE_TAG}
+                          --context=\${WORKSPACE}/app/backend \\
+                          --dockerfile=\${WORKSPACE}/app/backend/Dockerfile \\
+                          --destination=\${BACKEND_IMAGE}:\${IMAGE_TAG}
                     """
                 }
             }
         }
 
-        stage('Deploy') {
+        stage('Build and push Frontend image') {
+            steps {
+                container('kaniko') {
+                    sh """
+
+                        echo "Workspace: \${WORKSPACE}"
+                        pwd
+                        ls -la \${WORKSPACE}/app/frontend
+                        head -n 40 \${WORKSPACE}/app/frontend/Dockerfile
+
+                        /kaniko/executor \\
+                          --context=\${WORKSPACE}/app/frontend \\
+                          --dockerfile=\${WORKSPACE}/app/frontend/Dockerfile \\
+                          --destination=\${FRONTEND_IMAGE}:\${IMAGE_TAG}
+                    """
+                }
+            }
+        }
+
+        stage('Deploy Backend') {
+            steps {
+                container("kubectl"){
+                    withKubeConfig([credentialsId: 'k3s-credentials']) {
+                        sh """
+                            kubectl -n ${APP_NAMESPACE} apply -f k8s/app/back-asso-deploy.yaml 
+                            kubectl -n ${APP_NAMESPACE} apply -f k8s/app/back-asso-service.yaml 
+
+                            kubectl -n ${APP_NAMESPACE} set image deployment/back-ges-asso back-ges-asso=${BACKEND_IMAGE}:${IMAGE_TAG}
+                            kubectl -n ${APP_NAMESPACE} rollout status deployment/back-ges-asso --timeout=180s
+                        """
+                    }
+                }
+            }
+        }
+
+        stage('Deploy Frontend') {
             steps {
                 container("kubectl"){
                     withKubeConfig([credentialsId: 'k3s-credentials']) {
@@ -69,7 +154,7 @@ pipeline {
                             kubectl -n ${APP_NAMESPACE} apply -f k8s/app/front-asso-deploy.yaml 
                             kubectl -n ${APP_NAMESPACE} apply -f k8s/app/front-asso-service.yaml 
 
-                            kubectl -n ${APP_NAMESPACE} set image deployment/front-ges-asso front-ges-asso=${DOCKER_IMAGE}:${IMAGE_TAG}
+                            kubectl -n ${APP_NAMESPACE} set image deployment/front-ges-asso front-ges-asso=${FRONTEND_IMAGE}:${IMAGE_TAG}
                             kubectl -n ${APP_NAMESPACE} rollout status deployment/front-ges-asso --timeout=180s
                         """
                     }
