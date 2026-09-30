@@ -1,0 +1,36 @@
+#SPDX-License-Identifier: MIT-0
+---
+# tasks file for roles/k3s_prerequisites
+---
+# K3s prerequisite checks and configuration
+
+- name: Enable IPv4 forwarding
+  become: true
+  ansible.posix.sysctl:
+    name: net.ipv4.ip_forward
+    value: "1"
+    state: present
+    reload: true
+
+- name: Check K3s node names resolution
+  ansible.builtin.getent:
+    database: hosts
+    key:
+      - k3s-master
+      - k3s-worker
+  register: k3s_host_resolution
+
+- name: Verify K3s node IP address
+  ansible.builtin.assert:
+    that:
+      - ansible_host in ansible_all_ipv4_addresses
+    fail_msg: >-
+      The expected IP {{ ansible_host }} is not configured on
+      {{ inventory_hostname }}.
+    success_msg: >-
+      The expected IP {{ ansible_host }} is configured on
+      {{ inventory_hostname }}.
+  
+
+
+

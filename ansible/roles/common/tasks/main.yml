@@ -1,0 +1,25 @@
+---
+# Common tasks for all K3s nodes
+
+- name: Update APT package cache
+  become: true
+  ansible.builtin.apt:
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Install required packages
+  become: true
+  ansible.builtin.apt:
+    name:
+      - curl
+      - git
+      - unzip
+      - vim
+      - ca-certificates
+    state: present
+
+- name: Set the expected hostname
+  become: true
+  ansible.builtin.hostname:
+    name: "{{ inventory_hostname }}"
+    use: debian

@@ -1,0 +1,63 @@
+# SPDX-License-Identifier: MIT-0
+---
+
+# Tasks for installing and configuring the K3s server
+
+- name: Install K3s server
+  become: true
+  ansible.builtin.shell:
+    cmd: >-
+      curl -sfL https://get.k3s.io |
+      INSTALL_K3S_VERSION={{ k3s_version | quote }}
+      sh -s - server
+      --node-ip {{ k3s_server_ip }}
+      --advertise-address {{ k3s_server_ip }}
+  args:
+    creates: /usr/local/bin/k3s
+
+- name: Ensure K3s server service is enabled and started
+  become: true
+  ansible.builtin.systemd:
+    name: k3s
+    enabled: true
+    state: started
+
+- name: Read K3s cluster token
+  become: true
+  ansible.builtin.slurp:
+    src: /var/lib/rancher/k3s/server/node-token
+  register: k3s_token_file
+  no_log: true
+
+- name: Store K3s cluster token as a fact
+  ansible.builtin.set_fact:
+    k3s_node_token: "{{ k3s_token_file.content | b64decode | trim }}"
+  no_log: true
+
+- name: Create the Kubernetes configuration directory
+  ansible.builtin.file:
+    path: "{{ ansible_user_dir }}/.kube"
+    state: directory
+    mode: "0700"
+
+- name: Copy the K3s kubeconfig for the remote user
+  become: true
+  ansible.builtin.copy:
+    src: /etc/rancher/k3s/k3s.yaml
+    dest: "{{ ansible_user_dir }}/.kube/config"
+    remote_src: true
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: "0600"
+
+- name: Check Kubernetes API availability
+  become: true
+  ansible.builtin.command:
+    cmd: kubectl get nodes
+  environment:
+    KUBECONFIG: /etc/rancher/k3s/k3s.yaml
+  register: kubernetes_api_check
+  changed_when: false
+  retries: 12
+  delay: 5
+  until: kubernetes_api_check.rc == 0
