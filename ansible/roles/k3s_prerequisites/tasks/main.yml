@@ -1,5 +1,24 @@
 # K3s prerequisite checks and configuration
 
+- name: Install pip
+  become: true
+  ansible.builtin.apt:
+    name:
+      - python3-pip
+      - python3-venv
+    state: present
+    update_cache: true
+
+- name: Install Kubernetes Python dependencies
+  become: true
+  ansible.builtin.pip:
+    name:
+      - kubernetes
+      - PyYAML
+      - jsonpatch
+    state: present
+    break_system_packages: true
+
 - name: Enable IPv4 forwarding
   become: true
   ansible.posix.sysctl:
@@ -8,13 +27,25 @@
     state: present
     reload: true
 
+- name: Add K3s nodes to /etc/hosts
+  become: true
+  ansible.builtin.blockinfile:
+    path: /etc/hosts
+    marker: "# {mark} K3S CLUSTER"
+    block: |
+      {{ hostvars['k3s-master']['ansible_host'] }} k3s-master
+      {{ hostvars['k3s-worker']['ansible_host'] }} k3s-worker
+    state: present
+
 - name: Check K3s node names resolution
   ansible.builtin.getent:
     database: hosts
-    key:
-      - k3s-master
-      - k3s-worker
+    key: "{{ item }}"
+  loop:
+    - k3s-master
+    - k3s-worker
   register: k3s_host_resolution
+  changed_when: false
 
 - name: Verify K3s node IP address
   ansible.builtin.assert:

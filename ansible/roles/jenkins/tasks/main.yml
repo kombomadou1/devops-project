@@ -19,13 +19,13 @@
 
     - name: Create Jenkins service account and RBAC resources
       kubernetes.core.k8s:
-        src: "{{ role_path }}/files/jenkins-01-serviceAccount.yaml"
+        src: "{{ playbook_dir }}/../k8s/jenkins/jenkins-01-serviceAccount.yaml"
         state: present
       delegate_to: "{{ groups['k3s_master'][0] }}"
 
     - name: Create Jenkins persistent volume and storage class
       kubernetes.core.k8s:
-        src: "{{ role_path }}/files/jenkins-02-volume.yaml"
+        src: "{{ playbook_dir }}/../k8s/jenkins/jenkins-02-volume.yaml"
         state: present
       delegate_to: "{{ groups['k3s_master'][0] }}"
 
@@ -41,7 +41,7 @@
         chart_ref: jenkins/jenkins
         release_namespace: "{{ jenkins_namespace }}"
         values_files:
-          - "{{ role_path }}/files/jenkins-values.yml"
+          - "{{ playbook_dir }}/../k8s/jenkins/jenkins-values.yml"
         update_repo_cache: true
         wait: true
         wait_timeout: 600

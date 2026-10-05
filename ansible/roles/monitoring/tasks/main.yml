@@ -24,7 +24,7 @@
     release_namespace: "{{ monitoring_namespace }}"
     create_namespace: false
     values_files:
-      - "{{ role_path }}/files/prometheus-grafana-values.yaml"
+      - "{{ playbook_dir }}/../k8s/monitoring/prometheus-grafana-values.yaml"
     update_repo_cache: true
     wait: true
     wait_timeout: 10m
