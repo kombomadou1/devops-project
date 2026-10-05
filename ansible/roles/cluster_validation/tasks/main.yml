@@ -1,0 +1,20 @@
+#SPDX-License-Identifier: MIT-0
+---
+# tasks file for roles/cluster_validation
+
+- name: Ensure master node is ready
+  kubernetes.core.k8s_info:
+    api_version: v1
+    kind: Node
+    name: "{{ k3s_master_node_name }}"
+  register: master_node
+  until:
+    - master_node.resources | length > 0
+    - >
+      master_node.resources[0].status.conditions
+      | selectattr('type', 'equalto', 'Ready')
+      | map(attribute='status')
+      | first == 'True'
+  retries: 30
+  delay: 10
+  delegate_to: "{{ groups['k3s_master'][0] }}"

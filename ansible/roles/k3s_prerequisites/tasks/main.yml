@@ -1,7 +1,3 @@
-#SPDX-License-Identifier: MIT-0
----
-# tasks file for roles/k3s_prerequisites
----
 # K3s prerequisite checks and configuration
 
 - name: Enable IPv4 forwarding

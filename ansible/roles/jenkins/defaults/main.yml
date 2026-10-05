@@ -1,0 +1,7 @@
+#SPDX-License-Identifier: MIT-0
+---
+# defaults file for roles/jenkins
+
+jenkins_namespace: "jenkins"
+jenkins_repo_url: "https://charts.jenkins.io"
+k3s_worker_node_name: "k3s-worker"

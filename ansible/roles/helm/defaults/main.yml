@@ -1,0 +1,5 @@
+#SPDX-License-Identifier: MIT-0
+---
+# defaults file for roles/helm
+
+helm_version: "v4.3.0+gbec5b06"

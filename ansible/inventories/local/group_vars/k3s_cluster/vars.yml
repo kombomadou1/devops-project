@@ -1,1 +1,2 @@
 k3s_version: "v1.36.4+k3s1"
+k3s_server_url: "https://192.168.56.10:6443"

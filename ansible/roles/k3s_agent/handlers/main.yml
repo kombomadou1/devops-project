@@ -1,0 +1,7 @@
+# Handlers for the K3s agent role
+
+- name: Restart k3s-agent
+  become: true
+  ansible.builtin.systemd_service:
+    name: k3s-agent
+    state: restarted

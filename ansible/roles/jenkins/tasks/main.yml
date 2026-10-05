@@ -1,0 +1,73 @@
+---
+# Tasks for deploying Jenkins with Helm
+
+- name: Cordon Kubernetes worker node
+  kubernetes.core.k8s_drain:
+    name: "{{ k3s_worker_node_name }}"
+    state: cordon
+  delegate_to: "{{ groups['k3s_master'][0] }}"
+
+- name: Deploy Jenkins
+  block:
+    - name: Create Jenkins namespace
+      kubernetes.core.k8s:
+        api_version: v1
+        kind: Namespace
+        name: "{{ jenkins_namespace }}"
+        state: present
+      delegate_to: "{{ groups['k3s_master'][0] }}"
+
+    - name: Create Jenkins service account and RBAC resources
+      kubernetes.core.k8s:
+        src: "{{ role_path }}/files/jenkins-01-serviceAccount.yaml"
+        state: present
+      delegate_to: "{{ groups['k3s_master'][0] }}"
+
+    - name: Create Jenkins persistent volume and storage class
+      kubernetes.core.k8s:
+        src: "{{ role_path }}/files/jenkins-02-volume.yaml"
+        state: present
+      delegate_to: "{{ groups['k3s_master'][0] }}"
+
+    - name: Add Jenkins Helm repository
+      kubernetes.core.helm_repository:
+        name: jenkins
+        repo_url: "{{ jenkins_repo_url }}"
+      delegate_to: "{{ groups['k3s_master'][0] }}"
+
+    - name: Install Jenkins
+      kubernetes.core.helm:
+        name: jenkins
+        chart_ref: jenkins/jenkins
+        release_namespace: "{{ jenkins_namespace }}"
+        values_files:
+          - "{{ role_path }}/files/jenkins-values.yml"
+        update_repo_cache: true
+        wait: true
+        wait_timeout: 600
+        state: present
+      delegate_to: "{{ groups['k3s_master'][0] }}"
+      no_log: true
+
+    - name: Check Jenkins deployment
+      kubernetes.core.k8s_info:
+        api_version: apps/v1
+        kind: Deployment
+        name: jenkins
+        namespace: "{{ jenkins_namespace }}"
+      register: jenkins_deployment
+      until:
+        - jenkins_deployment.resources | length > 0
+        - >
+          jenkins_deployment.resources[0].status.readyReplicas
+          | default(0) | int > 0
+      retries: 30
+      delay: 10
+      delegate_to: "{{ groups['k3s_master'][0] }}"
+
+  always:
+    - name: Uncordon Kubernetes worker node
+      kubernetes.core.k8s_drain:
+        name: "{{ k3s_worker_node_name }}"
+        state: uncordon
+      delegate_to: "{{ groups['k3s_master'][0] }}"

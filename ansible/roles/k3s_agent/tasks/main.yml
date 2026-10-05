@@ -1,0 +1,60 @@
+# Tasks for installing and configuring the K3s agent
+
+- name: Wait for K3s API server
+  ansible.builtin.wait_for:
+    host: "{{ k3s_server_ip }}"
+    port: 6443
+    timeout: 60
+
+- name: Create K3s configuration directory
+  become: true
+  ansible.builtin.file:
+    path: /etc/rancher/k3s
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Configure K3s agent
+  become: true
+  ansible.builtin.copy:
+    dest: /etc/rancher/k3s/config.yaml
+    content: |
+      server: "{{ k3s_server_url }}"
+      token: "{{ k3s_node_token }}"
+      node-ip: "{{ k3s_agent_ip }}"
+    owner: root
+    group: root
+    mode: "0600"
+  no_log: true
+  notify: Restart k3s-agent
+
+- name: Install K3s agent
+  become: true
+  ansible.builtin.shell:
+    cmd: >-
+      curl -sfL https://get.k3s.io |
+      K3S_URL={{ k3s_server_url | quote }}
+      K3S_TOKEN={{ hostvars['k3s-master']['k3s_node_token'] | quote }}
+      sh -s - agent
+  args:
+    creates: /usr/local/bin/k3s
+  no_log: true
+
+- name: Enable and start K3s agent
+  become: true
+  ansible.builtin.systemd_service:
+    name: k3s-agent
+    enabled: true
+    state: started
+
+- name: Wait for K3s agent service
+  become: true
+  ansible.builtin.service_facts:
+
+- name: Verify K3s agent is running
+  ansible.builtin.assert:
+    that:
+      - ansible_facts.services["k3s-agent.service"].state == "running"
+    fail_msg: "The K3s agent is not running."
+    success_msg: "The K3s agent is running."
