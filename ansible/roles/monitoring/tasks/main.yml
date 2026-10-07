@@ -6,13 +6,18 @@
     name: prometheus-community
     repo_url: "{{ prometheus_repo_url }}"
 
+- name: Update Prometheus Helm repository only
+  become: false
+  ansible.builtin.command:
+    cmd: helm repo update prometheus-community
+  changed_when: false
+
 - name: Install Prometheus Operator CRDs
   kubernetes.core.helm:
     name: prometheus-operator-crds
     chart_ref: prometheus-community/prometheus-operator-crds
     release_namespace: "{{ monitoring_namespace }}"
     create_namespace: true
-    update_repo_cache: true
     wait: true
     wait_timeout: 10m
     state: present
@@ -23,22 +28,32 @@
     chart_ref: prometheus-community/kube-prometheus-stack
     release_namespace: "{{ monitoring_namespace }}"
     create_namespace: false
-    values_files:
-      - "{{ playbook_dir }}/../k8s/monitoring/prometheus-grafana-values.yaml"
-    update_repo_cache: true
+    release_values: >-
+          {{
+            lookup(
+              'ansible.builtin.file',
+              role_path + '/files/prometheus-grafana-values.yaml'
+            )
+            | from_yaml
+          }}
     wait: true
     wait_timeout: 10m
     state: present
 
-- name: Get Prometheus release
-  kubernetes.core.helm_info:
-    name: prometheus
-    release_namespace: "{{ monitoring_namespace }}"
-  register: prometheus_release
-
-- name: Validate Prometheus release
-  ansible.builtin.assert:
-    that:
-      - prometheus_release.status.status == "deployed"
-    fail_msg: "Prometheus stack deployment failed."
-    success_msg: "Prometheus and Grafana are deployed successfully."
+- name: Wait for Prometheus StatefulSet to be ready
+  kubernetes.core.k8s_info:
+    api_version: apps/v1
+    kind: StatefulSet
+    name: prometheus-prometheus-kube-prometheus-prometheus
+    namespace: "{{ monitoring_namespace }}"
+    kubeconfig: "{{ kubeconfig }}"
+  register: prometheus_statefulset
+  until:
+    - prometheus_statefulset.resources | length > 0
+    - >
+      prometheus_statefulset.resources[0].status.readyReplicas
+      | default(0) | int
+      ==
+      prometheus_statefulset.resources[0].spec.replicas | default(1) | int
+  retries: 30
+  delay: 10
