@@ -1,1 +1,4 @@
 kubeconfig: "/home/vagrant/.kube/config"
+
+k3s_master_node_name: "k3s-master"
+k3s_worker_node_name: "k3s-worker"

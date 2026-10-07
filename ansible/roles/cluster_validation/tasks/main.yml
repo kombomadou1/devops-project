@@ -7,6 +7,7 @@
     api_version: v1
     kind: Node
     name: "{{ k3s_master_node_name }}"
+    kubeconfig: "{{ kubeconfig }}"
   register: master_node
   until:
     - master_node.resources | length > 0
@@ -17,4 +18,20 @@
       | first == 'True'
   retries: 30
   delay: 10
-  delegate_to: "{{ groups['k3s_master'][0] }}"
+
+- name: Ensure worker node is ready
+  kubernetes.core.k8s_info:
+    api_version: v1
+    kind: Node
+    name: "{{ k3s_worker_node_name }}"
+    kubeconfig: "{{ kubeconfig }}"
+  register: worker_node
+  until:
+    - worker_node.resources | length > 0
+    - >
+      worker_node.resources[0].status.conditions
+      | selectattr('type', 'equalto', 'Ready')
+      | map(attribute='status')
+      | first == 'True'
+  retries: 30
+  delay: 10
