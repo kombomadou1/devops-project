@@ -1,11 +1,9 @@
 ---
 # Tasks for deploying Jenkins with Helm
-
 - name: Cordon Kubernetes worker node
   kubernetes.core.k8s_drain:
     name: "{{ k3s_worker_node_name }}"
     state: cordon
-  delegate_to: "{{ groups['k3s_master'][0] }}"
 
 - name: Deploy Jenkins
   block:
@@ -14,60 +12,83 @@
         api_version: v1
         kind: Namespace
         name: "{{ jenkins_namespace }}"
+        kubeconfig: "{{ kubeconfig }}"
         state: present
-      delegate_to: "{{ groups['k3s_master'][0] }}"
-
-    - name: Create Jenkins service account and RBAC resources
-      kubernetes.core.k8s:
-        src: "{{ playbook_dir }}/../k8s/jenkins/jenkins-01-serviceAccount.yaml"
-        state: present
-      delegate_to: "{{ groups['k3s_master'][0] }}"
 
     - name: Create Jenkins persistent volume and storage class
       kubernetes.core.k8s:
-        src: "{{ playbook_dir }}/../k8s/jenkins/jenkins-02-volume.yaml"
+        definition: >-
+          {{
+            lookup(
+              'ansible.builtin.file', 
+              role_path + '/files/jenkins-01-volume.yaml'
+            )
+            | from_yaml_all
+            | list
+          }}
+        kubeconfig: "{{ kubeconfig }}"
         state: present
-      delegate_to: "{{ groups['k3s_master'][0] }}"
+
+    - name: Create Jenkins service account and RBAC resources
+      kubernetes.core.k8s:
+        definition: >-
+          {{
+            lookup(
+              'ansible.builtin.file', 
+              role_path + '/files/jenkins-02-sa.yaml'
+            )
+            | from_yaml_all
+            | list
+          }}
+        kubeconfig: "{{ kubeconfig }}"
+        state: present
 
     - name: Add Jenkins Helm repository
+      become: false
       kubernetes.core.helm_repository:
         name: jenkins
         repo_url: "{{ jenkins_repo_url }}"
-      delegate_to: "{{ groups['k3s_master'][0] }}"
+        kubeconfig: "{{ kubeconfig }}"
+        state: present
 
     - name: Install Jenkins
+      become: false
       kubernetes.core.helm:
         name: jenkins
         chart_ref: jenkins/jenkins
         release_namespace: "{{ jenkins_namespace }}"
-        values_files:
-          - "{{ playbook_dir }}/../k8s/jenkins/jenkins-values.yml"
+        release_values: >-
+          {{
+            lookup(
+              'ansible.builtin.file',
+              role_path + '/files/jenkins-values.yaml'
+            )
+            | from_yaml
+          }}
+        kubeconfig: "{{ kubeconfig }}"
         update_repo_cache: true
         wait: true
         wait_timeout: 600
         state: present
-      delegate_to: "{{ groups['k3s_master'][0] }}"
-      no_log: true
+      # no_log: true
 
-    - name: Check Jenkins deployment
+    - name: Wait for Jenkins pod readiness
       kubernetes.core.k8s_info:
-        api_version: apps/v1
-        kind: Deployment
-        name: jenkins
+        api_version: v1
+        kind: Pod
+        name: jenkins-0
         namespace: "{{ jenkins_namespace }}"
-      register: jenkins_deployment
-      until:
-        - jenkins_deployment.resources | length > 0
-        - >
-          jenkins_deployment.resources[0].status.readyReplicas
-          | default(0) | int > 0
-      retries: 30
-      delay: 10
-      delegate_to: "{{ groups['k3s_master'][0] }}"
+        kubeconfig: "{{ kubeconfig }}"
+        wait: true
+        wait_condition:
+          type: Ready
+          status: "True"
+        wait_sleep: 10
+        wait_timeout: 300
 
   always:
     - name: Uncordon Kubernetes worker node
       kubernetes.core.k8s_drain:
         name: "{{ k3s_worker_node_name }}"
+        kubeconfig: "{{ kubeconfig }}"
         state: uncordon
-      delegate_to: "{{ groups['k3s_master'][0] }}"
