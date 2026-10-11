@@ -53,7 +53,7 @@ http://192.168.56.11:30000 (selon le noeud sur lequel il est déployé)
 http://back-ges-asso-service:3000
 ```
 
-Le backend doit écouter sur `0.0.0.0` et pas seulement sur `localhost`, sinon les autres pods du cluster ne peuvent pas y accéder.
+Le backend doit écouter sur `0.0.0.0` et non uniquement sur `localhost`, sinon il ne sera pas accessible depuis les autres pods du cluster.
 
 ## Frontend
 
