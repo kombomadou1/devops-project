@@ -1,8 +1,8 @@
 # Application
 
-Ce dossier contient le code source de l’application web utilisée dans le projet DevOps. Il s’agit d’une petite application de gestion d’associations, développée avec un backend NestJS et un frontend Angular.
+Ce dossier contient le code source de l’application web du projet DevOps. C’est une petite application de gestion d’associations, avec un backend NestJS et un frontend Angular.
 
-L’application permet notamment de créer des associations, d’ajouter des membres, de consulter la liste des associations disponibles et de gérer certaines informations liées à celles-ci. Les données sont stockées dans une base SQLite.
+L’application permet entre autres de créer des associations, d’ajouter des membres, de consulter la liste des associations et de gérer certaines informations qui leur sont liées. Les données sont stockées dans une base SQLite.
 
 ## Fonctionnalités
 
@@ -12,11 +12,11 @@ L’application permet notamment de créer des associations, d’ajouter des mem
 - Consulter et gérer les informations d’une association.
 - Gérer les minutes associées à une association.
 - Gérer les utilisateurs et les rôles.
-- S’authentifier afin d’accéder aux fonctionnalités de l’application.
+- S’authentifier pour accéder aux fonctionnalités de l’application.
 
 ## Compte de test
 
-Pour se connecter à l’application, les identifiants suivants peuvent être utilisés :
+Pour se connecter à l’application, on peut utiliser les identifiants suivants :
 
 ```text
 Nom d’utilisateur : 1
@@ -38,7 +38,7 @@ app/
 └── docker-compose.yaml
 ```
 
-Le dossier `backend/` contient l’API NestJS, tandis que le dossier `frontend/` contient l’application Angular. Le fichier `docker-compose.yaml` permet de lancer les deux applications en local avec Docker.
+Le dossier `backend/` contient l’API NestJS et le dossier `frontend/` l’application Angular. Le fichier `docker-compose.yaml` lance les deux applications en local avec Docker.
 
 ## Technologies utilisées
 
@@ -51,7 +51,7 @@ Le dossier `backend/` contient l’API NestJS, tandis que le dossier `frontend/`
 
 ## Lancer l’application avec Docker
 
-Depuis le dossier `app/`, lancer le backend et le frontend :
+Depuis le dossier `app/`, la commande suivante lance le backend et le frontend :
 
 ```bash
 docker compose up --build
@@ -69,19 +69,19 @@ docker compose down
 
 ### Backend
 
-Se placer dans le dossier du backend :
+Aller dans le dossier du backend :
 
 ```bash
 cd app/backend
 ```
 
-Installer les dépendances :
+Installation des dépendances :
 
 ```bash
 npm install
 ```
 
-Lancer l’application en mode développement :
+Lancement de l’application en mode développement :
 
 ```bash
 npm run start:dev
@@ -91,25 +91,25 @@ Le backend écoute sur le port `3000`.
 
 ### Frontend
 
-Dans un autre terminal, se placer dans le dossier du frontend :
+Dans un autre terminal, aller dans le dossier du frontend :
 
 ```bash
 cd app/frontend
 ```
 
-Installer les dépendances :
+Installation des dépendances :
 
 ```bash
 npm install
 ```
 
-Lancer l’application en mode développement :
+Lancement de l’application en mode développement :
 
 ```bash
 npm run start
 ```
 
-Le frontend est ensuite accessible depuis le navigateur à l’adresse affichée par Angular, généralement :
+Le frontend est ensuite accessible dans le navigateur, à l’adresse affichée par Angular, généralement :
 
 ```text
 http://localhost:4200
@@ -117,7 +117,7 @@ http://localhost:4200
 
 ## Tests
 
-Les tests peuvent être lancés séparément pour le backend et le frontend.
+Les tests se lancent séparément pour le backend et pour le frontend.
 
 Pour le backend :
 
@@ -133,7 +133,7 @@ cd app/frontend
 npm test
 ```
 
-Ces tests sont également exécutés dans la pipeline Jenkins avant la construction des images Docker.
+Ces tests sont aussi exécutés dans la pipeline Jenkins avant la construction des images Docker.
 
 ## Build des applications
 
@@ -151,11 +151,11 @@ cd app/frontend
 npm run build
 ```
 
-Les images Docker sont construites automatiquement par Kaniko dans la pipeline Jenkins, puis envoyées vers Docker Hub avant d’être déployées dans Kubernetes.
+Les images Docker sont construites automatiquement par Kaniko dans la pipeline Jenkins, puis envoyées sur Docker Hub avant d’être déployées dans Kubernetes.
 
 ## Communication frontend/backend
 
-Le frontend communique avec le backend à travers une URL d’API définie dans sa configuration.
+Le frontend communique avec le backend via une URL d’API définie dans sa configuration.
 
 En local, le backend est accessible sur :
 
@@ -169,4 +169,4 @@ Dans Kubernetes, le frontend utilise le nom du Service backend plutôt qu’une 
 http://back-ges-asso-service:3000
 ```
 
-Le backend doit écouter sur `0.0.0.0` afin d’être accessible depuis les autres pods du cluster.
+Le backend doit écouter sur `0.0.0.0` pour être accessible depuis les autres pods du cluster.
