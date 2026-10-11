@@ -1,18 +1,18 @@
 # Projet DevOps
 
-Ce projet consiste à mettre en place une plateforme DevOps locale complète, dans le but de mettre en pratique les compétences essentielles du domaine : provisionnement de machines virtuelles, déploiement d’un cluster Kubernetes, automatisation avec Ansible, intégration et déploiement continus avec Jenkins, ainsi que supervision avec Prometheus et Grafana.
+Ce projet met en place une plateforme DevOps en local : création de machines virtuelles, déploiement d’un cluster Kubernetes, automatisation avec Ansible, intégration et déploiement continus avec Jenkins, et supervision avec Prometheus et Grafana.
 
-L’environnement repose sur deux machines virtuelles Debian, sur lesquelles est déployé un cluster k3s. Une application web Angular/NestJS y est conteneurisée et déployée, tandis que Jenkins automatise la construction et la publication des images Docker. La supervision du cluster et des workloads est assurée par la stack `kube-prometheus-stack`.
+L’environnement repose sur deux machines virtuelles Debian, sur lesquelles tourne un cluster k3s. Une application web Angular/NestJS y est conteneurisée et déployée. Jenkins construit et publie les images Docker, et la supervision du cluster et des workloads repose sur la stack `kube-prometheus-stack`.
 
 ## Objectifs du projet
 
-- Créer un environnement local reproductible avec Vagrant et VirtualBox.
-- Déployer un cluster Kubernetes léger avec k3s, composé d’un nœud control-plane et d’un nœud worker.
+- Disposer d’un environnement local reproductible avec Vagrant et VirtualBox.
+- Déployer un cluster Kubernetes léger avec k3s, avec un nœud control-plane et un nœud worker.
 - Conteneuriser une application Angular/NestJS avec Docker.
 - Mettre en place un pipeline CI/CD avec Jenkins et Kaniko.
 - Automatiser l’installation et la configuration de l’infrastructure avec Ansible.
 - Superviser le cluster, les nœuds et les pods avec Prometheus et Grafana.
-- Documenter les problèmes rencontrés et les solutions mises en place.
+- Documenter les problèmes rencontrés et les solutions trouvées.
 
 ## Architecture
 
@@ -33,7 +33,7 @@ Machine hôte Windows
 +---------------------+        +---------------------+
 ```
 
-Les deux VMs utilisent un réseau NAT pour accéder à Internet et un réseau privé Host-Only pour communiquer entre elles ainsi qu’avec la machine hôte. Le nœud `k3s-master` héberge le control plane k3s ainsi que les composants de CI/CD et de monitoring, tandis que `k3s-worker` sert de nœud d’exécution pour les workloads.
+Les deux VMs ont un réseau NAT pour accéder à Internet et un réseau privé Host-Only pour communiquer entre elles et avec la machine hôte. Le nœud `k3s-master` héberge le control plane k3s, ainsi que la CI/CD et le monitoring. Le nœud `k3s-worker` exécute les workloads.
 
 ## Stack technique
 
@@ -75,7 +75,7 @@ Les deux VMs utilisent un réseau NAT pour accéder à Internet et un réseau pr
 
 ## Prérequis
 
-Avant de démarrer le projet, il faut disposer des éléments suivants :
+Pour démarrer le projet, il faut avoir :
 
 - Windows 10/11 comme machine hôte
 - VirtualBox
@@ -94,7 +94,7 @@ k3s-worker : 192.168.56.11
 
 ## Mise en place de l’infrastructure
 
-Les machines virtuelles sont définies dans le dossier `infra/` à l’aide d’un `Vagrantfile`. Initialement configurées avec 2 Go de RAM et 2 vCPU, leurs ressources ont ensuite été ajustées : le nœud master dispose désormais de 4 Go de RAM et 5 vCPU afin de supporter Jenkins, Prometheus et Grafana dans le cluster k3s.
+Les machines virtuelles sont définies dans le dossier `infra/` avec un `Vagrantfile`. Elles avaient au départ 2 Go de RAM et 2 vCPU. Les ressources du master ont ensuite été augmentées à 4 Go de RAM et 5 vCPU pour faire tourner Jenkins, Prometheus et Grafana dans le cluster k3s.
 
 ```bash
 cd infra
@@ -103,7 +103,7 @@ vagrant ssh k3s-master
 vagrant ssh k3s-worker
 ```
 
-L’accès SSH recommandé se fait via Vagrant, car celui-ci utilise automatiquement les clés générées pour chaque machine :
+Il est préférable de passer par Vagrant pour la connexion SSH, car il utilise automatiquement les clés générées pour chaque machine :
 
 ```bash
 vagrant ssh k3s-master
@@ -112,7 +112,7 @@ vagrant ssh k3s-worker
 
 ## Déploiement du cluster k3s
 
-Le control plane est installé sur `k3s-master`, en forçant l’utilisation de l’adresse du réseau privé :
+Le control plane s’installe sur `k3s-master`, en forçant l’adresse du réseau privé :
 
 ```bash
 curl -sfL https://get.k3s.io | \
@@ -121,13 +121,13 @@ curl -sfL https://get.k3s.io | \
   --advertise-address 192.168.56.10
 ```
 
-Le token du cluster est ensuite récupéré sur le master afin de permettre au worker de rejoindre le cluster :
+Le token du cluster se récupère ensuite sur le master, pour que le worker puisse rejoindre le cluster :
 
 ```bash
 sudo cat /var/lib/rancher/k3s/server/node-token
 ```
 
-Sur `k3s-worker`, l’agent k3s est installé avec l’adresse du serveur, le token et l’IP privée du worker :
+Sur `k3s-worker`, l’agent k3s s’installe avec l’adresse du serveur, le token et l’IP privée du worker :
 
 ```bash
 curl -sfL https://get.k3s.io | \
@@ -136,7 +136,7 @@ curl -sfL https://get.k3s.io | \
   sh -s - agent
 ```
 
-La bonne configuration du réseau est essentielle dans ce projet. Sans l’option `--node-ip`, k3s peut utiliser l’adresse NAT VirtualBox `10.0.2.15`, identique sur les deux VMs, ce qui empêche la communication correcte entre les nœuds.
+La configuration du réseau est un point clé du projet. Sans l’option `--node-ip`, k3s peut utiliser l’adresse NAT VirtualBox `10.0.2.15`, qui est la même sur les deux VMs, et les nœuds ne communiquent plus correctement.
 
 Vérification du cluster :
 
@@ -154,7 +154,7 @@ k3s-worker    Ready    <none>                 192.168.56.11
 
 ## Déploiement de l’application
 
-L’application est composée d’un frontend Angular et d’un backend NestJS. Chaque partie possède son propre `Dockerfile`, ce qui permet de construire des images distinctes.
+L’application se compose d’un frontend Angular et d’un backend NestJS. Chacun a son propre `Dockerfile`, donc les images sont construites séparément.
 
 Les manifests Kubernetes correspondants se trouvent dans `k8s/app/` :
 
@@ -166,35 +166,35 @@ k8s/app/
 └── front-asso-service.yaml
 ```
 
-Ils permettent de déployer les pods, d’exposer les services et de rendre l’application accessible depuis le cluster.
+Ils servent à déployer les pods, à exposer les services et à rendre l’application accessible depuis le cluster.
 
 ## Pipeline CI/CD avec Jenkins
 
-Jenkins est déployé dans le cluster Kubernetes à l’aide du chart Helm officiel. Il est exposé via un `NodePort` afin d’être accessible depuis la machine hôte :
+Jenkins est déployé dans le cluster Kubernetes avec le chart Helm officiel. Il est exposé via un `NodePort` pour être accessible depuis la machine hôte :
 
 ```text
 http://192.168.56.10:30080
 ```
 
-La configuration personnalisée de Jenkins comprend notamment :
+La configuration personnalisée de Jenkins comprend :
 
-- Un namespace dédié `jenkins`
+- Un namespace `jenkins` dédié
 - Un `ServiceAccount` et des règles RBAC pour interagir avec le cluster
-- Un volume persistant pour conserver les données Jenkins
+- Un volume persistant pour garder les données de Jenkins
 - Une exposition en `NodePort` sur le port `30080`
-- L’utilisation d’agents Kubernetes pour exécuter les builds
+- Des agents Kubernetes pour exécuter les builds
 
-Les pipelines Jenkins sont définis sous forme de `Jenkinsfile` :
+Les pipelines Jenkins sont écrits dans des `Jenkinsfile` :
 
-- `Jenkinsfile.backend` pour la construction du backend NestJS
-- `Jenkinsfile.frontend` pour la construction du frontend Angular
+- `Jenkinsfile.backend` pour construire le backend NestJS
+- `Jenkinsfile.frontend` pour construire le frontend Angular
 - `Jenkinsfile.complete` pour une chaîne complète de build et de déploiement
 
-Les images sont construites dans le cluster avec Kaniko, ce qui évite d’avoir à exposer le Docker daemon de la VM ou à installer Docker directement dans les agents Jenkins. Les images produites sont ensuite publiées sur Docker Hub.
+Les images sont construites dans le cluster avec Kaniko. Cela évite d’exposer le Docker daemon de la VM ou d’installer Docker dans les agents Jenkins. Les images sont ensuite publiées sur Docker Hub.
 
 ## Supervision avec Prometheus et Grafana
 
-La supervision est déployée avec le chart Helm `kube-prometheus-stack`. Ce chart installe notamment Prometheus, Grafana, Alertmanager, `kube-state-metrics` et Node Exporter.
+La supervision est déployée avec le chart Helm `kube-prometheus-stack`, qui installe entre autres Prometheus, Grafana, Alertmanager, `kube-state-metrics` et Node Exporter.
 
 ```bash
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
@@ -212,14 +212,14 @@ Grafana est exposé via un `NodePort` :
 http://192.168.56.10:30030
 ```
 
-Les dashboards par défaut permettent de superviser :
+Les dashboards par défaut permettent de suivre :
 
 - L’état global du cluster
 - La consommation CPU et mémoire des nœuds
 - Les ressources utilisées par les pods et les namespaces
 - Les métriques système collectées par Node Exporter
 
-Prometheus peut être consulté temporairement avec un port-forward :
+Prometheus peut être consulté ponctuellement avec un port-forward :
 
 ```bash
 kubectl port-forward \
@@ -229,7 +229,7 @@ kubectl port-forward \
   9090:9090
 ```
 
-Puis en ouvrant :
+Puis ouvrir :
 
 ```text
 http://192.168.56.10:9090
@@ -237,9 +237,9 @@ http://192.168.56.10:9090
 
 ## Automatisation avec Ansible
 
-Ansible est utilisé depuis WSL comme nœud de contrôle. Il se connecte aux deux VMs en SSH afin d’automatiser leur préparation, l’installation de k3s, l’installation de Helm et le déploiement des composants.
+Ansible est utilisé depuis WSL, qui sert de nœud de contrôle. Il se connecte en SSH aux deux VMs pour automatiser leur préparation, l’installation de k3s et de Helm, et le déploiement des composants.
 
-L’organisation retenue sépare clairement l’inventaire, les variables, les playbooks et les rôles :
+L’organisation sépare l’inventaire, les variables, les playbooks et les rôles :
 
 ```text
 ansible/
@@ -259,7 +259,7 @@ ansible/
     └── cluster_validation/
 ```
 
-Le playbook principal est `ansible/playbooks/site.yml`. Il applique les rôles dans l’ordre suivant :
+Le playbook principal est `ansible/playbooks/site.yml`. Il applique les rôles dans cet ordre :
 
 ```text
 common
@@ -272,9 +272,9 @@ common
 → cluster_validation
 ```
 
-Les secrets sensibles, comme le token k3s ou les identifiants Docker Hub, sont prévus dans un fichier chiffré avec Ansible Vault et ne doivent jamais être versionnés en clair.
+Les secrets, comme le token k3s ou les identifiants Docker Hub, sont prévus dans un fichier chiffré avec Ansible Vault et ne doivent jamais être versionnés en clair.
 
-Exécution du playbook :
+Lancement du playbook :
 
 ```bash
 cd ansible
@@ -289,19 +289,19 @@ ansible all -m ansible.builtin.ping
 
 ## Problèmes rencontrés
 
-Plusieurs problèmes ont été rencontrés au cours du projet, notamment liés au réseau, au DNS et à la gestion des ressources Kubernetes.
+Quelques problèmes sont apparus pendant le projet, surtout autour du réseau, du DNS et de la gestion des ressources Kubernetes.
 
 ### Adresses IP identiques sur les nœuds
 
-Les deux VMs utilisaient initialement l’adresse NAT `10.0.2.15`. Cette adresse étant identique sur les deux machines, le control plane ne pouvait pas joindre correctement le kubelet du worker.
+Au départ, les deux VMs utilisaient l’adresse NAT `10.0.2.15`. Comme elle est la même sur les deux machines, le control plane n’arrivait pas à joindre le kubelet du worker.
 
-La solution a consisté à forcer les IP du réseau privé avec `--node-ip` sur le master et `node-ip` dans la configuration de l’agent sur le worker.
+La solution consiste à forcer les IP du réseau privé avec `--node-ip` sur le master et `node-ip` dans la configuration de l’agent sur le worker.
 
 ### Résolution DNS défaillante
 
-Les pods rencontraient des erreurs `ErrImagePull` ou `ImagePullBackOff`, car ils ne parvenaient pas à résoudre `registry-1.docker.io`. Le problème venait de la configuration DNS des VMs, et non des images elles-mêmes.
+Les pods avaient des erreurs `ErrImagePull` ou `ImagePullBackOff`, car ils n’arrivaient pas à résoudre `registry-1.docker.io`. Le problème venait de la configuration DNS des VMs, pas des images.
 
-La correction a consisté à utiliser des serveurs DNS publics, puis à vérifier la résolution depuis un pod :
+La correction consiste à utiliser des serveurs DNS publics, puis à vérifier la résolution depuis un pod :
 
 ```bash
 kubectl run test-net \
@@ -313,7 +313,7 @@ kubectl run test-net \
 
 ### CoreDNS et monitoring
 
-Grafana ne parvenait pas à joindre le service Prometheus à cause d’un blocage du plugin Kubernetes de CoreDNS. Un redémarrage du déploiement CoreDNS a permis de rétablir la résolution DNS interne :
+Grafana n’arrivait pas à joindre le service Prometheus à cause d’un blocage du plugin Kubernetes de CoreDNS. Redémarrer le déploiement CoreDNS rétablit la résolution DNS interne :
 
 ```bash
 kubectl rollout restart deployment/coredns -n kube-system
@@ -321,7 +321,7 @@ kubectl rollout restart deployment/coredns -n kube-system
 
 ### Décalage horaire des VMs
 
-Prometheus affichait des métriques incohérentes à cause d’un décalage important de l’horloge système. La synchronisation a été corrigée avec Chrony :
+Prometheus affichait des métriques incohérentes à cause d’un gros décalage de l’horloge système. La synchronisation se corrige avec Chrony :
 
 ```bash
 sudo chronyc makestep
@@ -329,7 +329,7 @@ sudo chronyc makestep
 
 ## Compétences mises en pratique
 
-- Provisionnement d’un environnement multi-VM avec Vagrant et VirtualBox
+- Création d’un environnement multi-VM avec Vagrant et VirtualBox
 - Administration d’un cluster Kubernetes k3s
 - Écriture et application de manifests Kubernetes
 - Conteneurisation d’une application frontend et backend
@@ -338,7 +338,7 @@ sudo chronyc makestep
 - Automatisation de l’infrastructure avec Ansible
 - Gestion des secrets avec Ansible Vault
 - Supervision d’un cluster avec Prometheus et Grafana
-- Diagnostic réseau, DNS, stockage et synchronisation temporelle
+- Diagnostic de problèmes de réseau, de DNS, de stockage et de synchronisation de l’heure
 - Documentation technique et retour d’expérience
 
 ## Améliorations possibles
@@ -352,4 +352,4 @@ sudo chronyc makestep
 
 ## Captures d’écran
 
-Des captures de Grafana sont disponibles dans le dossier `monitoring/screenshots/`. Elles illustrent la supervision des ressources du cluster, des nœuds et des pods.
+Des captures de Grafana sont dans le dossier `monitoring/screenshots/`. Elles montrent la supervision des ressources du cluster, des nœuds et des pods.
