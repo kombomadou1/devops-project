@@ -87,3 +87,21 @@ vagrant destroy -f
 rm -rf .vagrant
 vagrant up
 ```
+## Problème rencontré
+
+Au premier lancement des VMs avec `vagrant up`, une erreur `E_ACCESSDENIED` apparaissait et empêchait Vagrant de créer ou démarrer les machines virtuelles.
+
+Le problème venait du service **VirtualBox System Service**, qui n’était pas démarré sur la machine hôte. Sans ce service, Vagrant ne peut pas communiquer correctement avec VirtualBox.
+
+Pour le résoudre :
+
+1. Ouvrir le gestionnaire de services Windows avec `Win + R`, puis `services.msc`.
+2. Rechercher **VirtualBox System Service**.
+3. Faire un clic droit sur le service et sélectionner **Démarrer**.
+4. Relancer la commande :
+
+```bash
+vagrant up
+```
+
+Après le démarrage du service, les VMs ont pu être créées et lancées normalement.
