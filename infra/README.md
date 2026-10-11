@@ -1,8 +1,8 @@
 # Infrastructure
 
-Ce dossier contient l’infrastructure locale utilisée pour le projet : deux machines virtuelles Debian créées avec Vagrant et VirtualBox.
+Ce dossier contient l’infrastructure locale du projet : deux machines virtuelles Debian créées avec Vagrant et VirtualBox.
 
-L’objectif est de mettre en place un petit environnement Kubernetes composé d’un nœud control plane et d’un nœud worker. Le cluster k3s est ensuite utilisé pour déployer Jenkins, Prometheus et Grafana.
+L’objectif est d’avoir un petit environnement Kubernetes avec un nœud control plane et un nœud worker. Le cluster k3s sert ensuite à déployer Jenkins, Prometheus et Grafana.
 
 ## Machines virtuelles
 
@@ -11,9 +11,9 @@ L’objectif est de mettre en place un petit environnement Kubernetes composé d
 | `k3s-master` | Control plane Kubernetes | `192.168.56.10` | 4 Go | 5 |
 | `k3s-worker` | Nœud worker Kubernetes | `192.168.56.11` | 2 Go | 2 |
 
-Au départ, le nœud master disposait des mêmes ressources que le worker. Ses ressources ont ensuite été augmentées car Jenkins, Prometheus et Grafana sont déployés dans le cluster et nécessitent davantage de mémoire et de CPU.
+Au départ, le nœud master avait les mêmes ressources que le worker. Elles ont ensuite été augmentées, car Jenkins, Prometheus et Grafana sont déployés dans le cluster et demandent plus de mémoire et de CPU.
 
-Les deux VMs utilisent l’image `debian/bookworm64`. Elles possèdent une interface NAT pour accéder à Internet, ainsi qu’un réseau privé Host-Only leur permettant de communiquer entre elles avec des adresses IP fixes.
+Les deux VMs utilisent l’image `debian/bookworm64`. Elles ont une interface NAT pour accéder à Internet et un réseau privé Host-Only, qui leur permet de communiquer entre elles avec des adresses IP fixes.
 
 ## Prérequis
 
@@ -39,7 +39,7 @@ vagrant status
 
 ## Se connecter aux VMs
 
-La méthode recommandée consiste à passer par Vagrant, qui utilise automatiquement la bonne clé SSH :
+Il est conseillé de passer par Vagrant, qui utilise automatiquement la bonne clé SSH :
 
 ```bash
 vagrant ssh k3s-master
@@ -64,7 +64,7 @@ k3s-master : 192.168.56.10
 k3s-worker : 192.168.56.11
 ```
 
-Ce réseau est important car Kubernetes doit utiliser ces adresses IP fixes. L’interface NAT utilise la même adresse par défaut sur les deux VMs (`10.0.2.15`) et ne peut donc pas servir à la communication entre les nœuds.
+Ce réseau est important, car Kubernetes doit utiliser ces adresses IP fixes. L’interface NAT a la même adresse par défaut sur les deux VMs (`10.0.2.15`) et ne peut donc pas servir à la communication entre les nœuds.
 
 ## Arrêter ou supprimer les VMs
 
@@ -80,7 +80,7 @@ Pour les supprimer et nettoyer l’état Vagrant :
 vagrant destroy -f
 ```
 
-Si VirtualBox conserve des VMs anciennes ou corrompues, elles peuvent être supprimées avec :
+Si VirtualBox garde des VMs anciennes ou corrompues, elles peuvent être supprimées avec :
 
 ```bash
 vagrant destroy -f
@@ -89,7 +89,7 @@ vagrant up
 ```
 ## Problème rencontré
 
-Au premier lancement des VMs avec `vagrant up`, une erreur `E_ACCESSDENIED` apparaissait et empêchait Vagrant de créer ou démarrer les machines virtuelles.
+Au premier lancement des VMs avec `vagrant up`, une erreur `E_ACCESSDENIED` apparaissait et empêchait Vagrant de créer ou de démarrer les machines virtuelles.
 
 Le problème venait du service **VirtualBox System Service**, qui n’était pas démarré sur la machine hôte. Sans ce service, Vagrant ne peut pas communiquer correctement avec VirtualBox.
 
@@ -104,4 +104,4 @@ Pour le résoudre :
 vagrant up
 ```
 
-Après le démarrage du service, les VMs ont pu être créées et lancées normalement.
+Une fois le service démarré, les VMs ont pu être créées et lancées normalement.
