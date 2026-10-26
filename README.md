@@ -249,6 +249,14 @@ Les dashboards par défaut permettent de suivre :
 - Les ressources utilisées par les pods et les namespaces
 - Les métriques système collectées par Node Exporter
 
+![Consommation mémoire des pods dans Grafana](monitoring/screenshots/all_memory_metric.png)
+
+*Consommation mémoire des pods du cluster.*
+
+![Évolution de la mémoire du pod Grafana](monitoring/screenshots/grafana_memory_metric.png)
+
+*Évolution de la consommation mémoire du pod Grafana dans le temps.*
+
 Prometheus peut être consulté ponctuellement avec un port-forward :
 
 ```bash
@@ -382,6 +390,6 @@ sudo chronyc makestep
 
 ## Captures d’écran
 
-Les captures de l’application et du pipeline Jenkins sont intégrées dans leurs sections respectives, et leurs fichiers se trouvent dans `app/screenshots/` et `jenkins/screenshots/`.
+## Captures d’écran
 
-Des captures de Grafana sont dans le dossier `monitoring/screenshots/`. Elles montrent la supervision des ressources du cluster, des nœuds et des pods.
+Les captures de l’application, du pipeline Jenkins et de Grafana sont intégrées dans leurs sections respectives. Les fichiers se trouvent dans `app/screenshots/`, `jenkins/screenshots/` et `monitoring/screenshots/`.
