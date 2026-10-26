@@ -57,13 +57,15 @@ Les deux VMs ont un réseau NAT pour accéder à Internet et un réseau privé H
 
 ```text
 .
-├── app/                  # Application Angular (frontend) et NestJS (backend)
+├── app/                  # Application Angular (frontend) et NestJS (backend), avec captures d’écran
+│   └── screenshots/      # Captures de l’application déployée
 ├── infra/                # Vagrantfile et configuration des VMs
 ├── k8s/                  # Manifests Kubernetes et fichiers Helm
 │   ├── app/              # Deployments et Services de l’application
 │   ├── jenkins/          # Configuration Jenkins
 │   └── monitoring/       # Configuration Prometheus et Grafana
 ├── jenkins/              # Documentation liée à Jenkins
+│   └── screenshots/      # Captures du pipeline Jenkins
 ├── ansible/              # Inventaire, playbooks et rôles Ansible
 ├── monitoring/           # Dashboards Grafana et captures d’écran
 ├── Jenkinsfile           # Pipeline Jenkins principal
@@ -168,6 +170,16 @@ k8s/app/
 
 Ils servent à déployer les pods, à exposer les services et à rendre l’application accessible depuis le cluster.
 
+Une fois déployée par le pipeline, l’application est accessible depuis la machine hôte.
+
+![Page de connexion de l’application déployée](app/screenshots/login.png)
+
+*Page de connexion de l’application.*
+
+![Liste des utilisateurs de l’application déployée](app/screenshots/user_list.png)
+
+*Liste des utilisateurs, servie par le backend NestJS déployé sur le cluster.*
+
 ## Pipeline CI/CD avec Jenkins
 
 Jenkins est déployé dans le cluster Kubernetes avec le chart Helm officiel. Il est exposé via un `NodePort` pour être accessible depuis la machine hôte :
@@ -190,6 +202,24 @@ Les pipelines Jenkins sont écrits dans des `Jenkinsfile` :
 - `Jenkinsfile.frontend` pour construire le frontend Angular
 - `Jenkinsfile.complete` pour une chaîne complète de build et de déploiement
 
+Le pipeline complet enchaîne les étapes suivantes :
+
+1. Récupération du code depuis Git
+2. Installation des dépendances du backend et du frontend
+3. Exécution des tests
+4. Build des applications
+5. Construction et publication des images Docker avec Kaniko
+6. Déploiement du backend et du frontend dans le namespace `ges-asso`
+7. Mise à jour des images utilisées par les Deployments Kubernetes
+
+![Pipeline Jenkins : toutes les étapes réussies](jenkins/screenshots/pipeline.png)
+
+*Vue du pipeline : toutes les étapes sont réussies.*
+
+![Durée de chaque étape et durée totale du pipeline](jenkins/screenshots/build_list.png)
+
+*Durée de chaque étape et durée totale du pipeline, inférieure à 20 minutes.*
+
 Les images sont construites dans le cluster avec Kaniko. Cela évite d’exposer le Docker daemon de la VM ou d’installer Docker dans les agents Jenkins. Les images sont ensuite publiées sur Docker Hub.
 
 ## Supervision avec Prometheus et Grafana
@@ -203,7 +233,7 @@ helm repo update
 helm install prometheus prometheus-community/kube-prometheus-stack \
   --namespace monitoring \
   --create-namespace \
-  --f k8s/monitoring/prometheus-grafana-values.yaml
+  -f k8s/monitoring/prometheus-grafana-values.yaml
 ```
 
 Grafana est exposé via un `NodePort` :
@@ -351,5 +381,7 @@ sudo chronyc makestep
 - Étendre l’infrastructure avec Terraform vers un environnement cloud
 
 ## Captures d’écran
+
+Les captures de l’application et du pipeline Jenkins sont intégrées dans leurs sections respectives, et leurs fichiers se trouvent dans `app/screenshots/` et `jenkins/screenshots/`.
 
 Des captures de Grafana sont dans le dossier `monitoring/screenshots/`. Elles montrent la supervision des ressources du cluster, des nœuds et des pods.

@@ -26,9 +26,9 @@ controller:
   installPlugins: [] #Very important, otherwise, Error
 
 persistence:
-    enabled: true
-    storageClass: jenkins-pv
-    size: 5Gi
+  enabled: true
+  storageClass: jenkins-pv
+  size: 5Gi
 
 serviceAccount: #Added
   create: false
