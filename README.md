@@ -69,7 +69,7 @@ Les deux VMs ont un réseau NAT pour accéder à Internet et un réseau privé H
 ├── ansible/              # Inventaire, playbooks et rôles Ansible
 ├── monitoring/           # Dashboards Grafana et captures d’écran
 ├── Jenkinsfile           # Pipeline Jenkins principal
-├── Jenkinsfile.complete  # Pipeline Jenkins principal (avec le manifest des agent mis en évidence)
+├── Jenkinsfile.complete  # Pipeline Jenkins principal (avec le manifest des agents mis en évidence)
 ├── Jenkinsfile.backend   # Pipeline du backend NestJS
 ├── Jenkinsfile.frontend  # Pipeline du frontend Angular
 └── README.md
