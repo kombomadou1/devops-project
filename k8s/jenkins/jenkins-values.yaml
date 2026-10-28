@@ -16,8 +16,8 @@ controller:
 
   admin:
     createSecret: true
-    username: admin
-    password: admin123
+    username: #put  your username here
+    password: #put your password here
 
   healthProbes: true
 

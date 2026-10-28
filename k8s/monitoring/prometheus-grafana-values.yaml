@@ -4,8 +4,8 @@ grafana:
   enabled: true
 
   # Identifiants admin
-  adminUser: admin
-  adminPassword: admin123
+  adminUser: #put  your username here
+  adminPassword: #put your password here
 
   # Ressources allouées
   resources:
