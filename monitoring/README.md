@@ -119,7 +119,7 @@ http://192.168.56.10:30030
 
 Les identifiants sont à définir dans le fichier de configuration.
 
-Ces identifiants ne conviennent que pour un environnement local de démonstration. Dans un environnement partagé ou en production, il faut un mot de passe fort stocké dans un Secret Kubernetes.
+Pour un environnement partagé ou en production, utilise un mot de passe fort stocké dans un Secret Kubernetes.
 
 ## Accès à Prometheus
 

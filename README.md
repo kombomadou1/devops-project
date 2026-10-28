@@ -389,6 +389,4 @@ sudo chronyc makestep
 
 ## Captures d’écran
 
-## Captures d’écran
-
 Les captures de l’application, du pipeline Jenkins et de Grafana sont intégrées dans leurs sections respectives. Les fichiers se trouvent dans `app/screenshots/`, `jenkins/screenshots/` et `monitoring/screenshots/`.
