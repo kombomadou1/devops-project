@@ -114,12 +114,7 @@ Jenkins est accessible depuis la machine hôte à l’adresse suivante :
 http://192.168.56.10:30080
 ```
 
-Les identifiants définis dans le fichier de configuration :
-
-```text
-Utilisateur : admin
-Mot de passe : admin123
-```
+Les identifiants sont à définir dans le fichier de configuration.
 
 ## Configuration pour la pipeline
 

@@ -117,12 +117,7 @@ Grafana est exposé via un `NodePort` sur le port `30030`, il est donc accessibl
 http://192.168.56.10:30030
 ```
 
-Les identifiants définis dans le fichier de configuration :
-
-```text
-Utilisateur : admin
-Mot de passe : admin123
-```
+Les identifiants sont à définir dans le fichier de configuration.
 
 Ces identifiants ne conviennent que pour un environnement local de démonstration. Dans un environnement partagé ou en production, il faut un mot de passe fort stocké dans un Secret Kubernetes.
 

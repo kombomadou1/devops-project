@@ -374,7 +374,6 @@ sudo chronyc makestep
 - Mise en place d’un pipeline CI/CD avec Jenkins
 - Construction d’images dans Kubernetes avec Kaniko
 - Automatisation de l’infrastructure avec Ansible
-- Gestion des secrets avec Ansible Vault
 - Supervision d’un cluster avec Prometheus et Grafana
 - Diagnostic de problèmes de réseau, de DNS, de stockage et de synchronisation de l’heure
 - Documentation technique et retour d’expérience
