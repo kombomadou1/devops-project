@@ -72,6 +72,7 @@ Les deux VMs ont un réseau NAT pour accéder à Internet et un réseau privé H
 ├── Jenkinsfile.complete  # Pipeline Jenkins principal (avec le manifest des agents mis en évidence)
 ├── Jenkinsfile.backend   # Pipeline du backend NestJS
 ├── Jenkinsfile.frontend  # Pipeline du frontend Angular
+├── TROUBLESHOOTING.md    # Problèmes rencontrés et solutions, classés par domaine
 └── README.md
 ```
 
@@ -328,6 +329,8 @@ ansible all -m ansible.builtin.ping
 ## Problèmes rencontrés
 
 Quelques problèmes sont apparus pendant le projet, surtout autour du réseau, du DNS et de la gestion des ressources Kubernetes.
+
+Les plus marquants sont résumés ci-dessous. Le détail complet de chaque problème (symptôme, cause et solution) se trouve dans [TROUBLESHOOTING.md](TROUBLESHOOTING.md).
 
 ### Adresses IP identiques sur les nœuds
 
